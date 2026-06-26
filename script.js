@@ -63,8 +63,8 @@ let frame = 0;
 function animateGrid() { drawGrid(frame++); requestAnimationFrame(animateGrid); }
 animateGrid();
 
-// ── TYPING ANIMATION — runs once, stops on final line ──────────────
-const lines = ['Learn markets.', 'Trade with conviction.'];
+// ── TYPING ANIMATION — runs once, stops on final line ──────────
+const lines = ["Information isn't the edge.", "Understanding is."];
 const typedEl = document.getElementById('typed-text');
 let lineIndex = 0;
 let charIndex = 0;
@@ -77,10 +77,8 @@ function type() {
     typedEl.textContent = current.slice(0, ++charIndex);
     if (charIndex === current.length) {
       if (lineIndex < lines.length - 1) {
-        // More lines to go — pause then delete
         setTimeout(() => { deleting = true; type(); }, 1000);
       }
-      // Last line fully typed — stop. Cursor keeps blinking.
       return;
     }
   } else {
@@ -96,7 +94,6 @@ function type() {
   setTimeout(type, deleting ? 35 : 65);
 }
 
-// Start typing 0.8s after load — grid is already visible by then
 setTimeout(type, 800);
 
 // ── COUNTDOWN ─────────────────────────────────────────────────
