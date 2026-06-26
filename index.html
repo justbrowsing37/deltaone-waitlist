@@ -5,45 +5,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Delta One — Learn Markets. Trade with Conviction.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
+  <!-- CANVAS BACKGROUND -->
+  <canvas id="bg-canvas"></canvas>
+
   <!-- NAV -->
   <nav>
     <span class="logo">Delta One</span>
-    <a href="#waitlist" class="nav-cta">Join Waitlist</a>
+    <span class="nav-status">// Private Beta &middot; Launching January 1, 2027</span>
   </nav>
 
   <!-- HERO -->
   <section class="hero">
     <div class="hero-content">
-      <h1>Learn markets.<br>Trade with conviction.</h1>
+      <div class="hero-label mono">delta.one</div>
+      <h1><span id="typed-text"></span><span class="cursor">|</span></h1>
       <p class="subheadline">Delta One is a fintech education platform built for students who are tired of market noise. Structured learning that builds real market understanding — from first principles to live markets.</p>
 
-      <div id="waitlist" class="waitlist-form">
-        <p class="form-label">Be first in when we launch January 1, 2027.</p>
+      <div class="waitlist-form">
+        <p class="form-label mono">// Be first in when we launch January 1, 2027.</p>
         <form id="signup-form">
           <input type="email" id="email-input" placeholder="your@email.com" required />
           <button type="submit" id="submit-btn">Join Waitlist</button>
         </form>
-        <p class="form-disclaimer">No spam. No credit card. Just early access.</p>
         <p id="form-message" class="form-message hidden"></p>
       </div>
 
-      <div class="countdown">
+      <div class="countdown mono">
         <span id="days-count">—</span> days until launch
       </div>
     </div>
   </section>
 
+  <!-- STATS -->
+  <section class="stats reveal">
+    <div class="section-label mono">platform.stats</div>
+    <div class="stats-grid">
+      <div class="stat-block">
+        <div class="stat-number">18</div>
+        <div class="stat-title">Lessons</div>
+        <div class="stat-sub mono">// Structured curriculum<br>from first principles</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-number">5</div>
+        <div class="stat-title">Modules</div>
+        <div class="stat-sub mono">// Progressive pathways<br>built for real understanding</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-number">100%</div>
+        <div class="stat-title">Free Forever</div>
+        <div class="stat-sub mono">// Delta Core has no paywall.<br>Learning shouldn't cost entry.</div>
+      </div>
+    </div>
+  </section>
+
   <!-- MODULES -->
-  <section class="modules">
+  <section class="modules reveal">
+    <div class="section-label mono">platform.modules</div>
     <div class="modules-grid">
 
       <div class="module-card">
-        <div class="module-tag">Delta Core — Free Forever</div>
+        <div class="module-tag mono">delta.core — free forever</div>
         <h2>The learning<br>terminal.</h2>
         <p>Build market structure from first principles. Understand why prices move — not just when.</p>
         <ul>
@@ -56,7 +82,7 @@
       </div>
 
       <div class="module-card module-card--pro">
-        <div class="module-tag module-tag--pro">Delta Pro — Live Terminal</div>
+        <div class="module-tag mono">delta.pro — live terminal</div>
         <h2>The market<br>workspace.</h2>
         <p>Step into live markets with the foundation you built in Core. Real-time data and AI analysis — synchronized in one terminal.</p>
         <ul>
@@ -72,16 +98,15 @@
   </section>
 
   <!-- FOOTER -->
-  <footer>
+  <footer class="reveal">
     <span class="footer-logo">Delta One</span>
     <div class="footer-links">
-      <a href="/pricing">Pricing</a>
       <a href="https://github.com/justbrowsing37/DeltaOne" target="_blank">GitHub</a>
       <a href="mailto:hello@deltaone.app">Contact</a>
       <a href="https://www.linkedin.com/company/thedeltaone" target="_blank">LinkedIn</a>
       <a href="https://instagram.com/thedeltaone" target="_blank">Instagram</a>
     </div>
-    <p class="footer-disclaimer">Delta One is a fintech education platform. Delta One does not provide financial advice. All trading involves risk.</p>
+    <p class="footer-disclaimer mono">// Delta One is a fintech education platform. Delta One does not provide financial advice. All trading involves risk.</p>
   </footer>
 
   <script src="script.js"></script>
