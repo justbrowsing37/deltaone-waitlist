@@ -16,7 +16,7 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   background-color: var(--bg);
   color: var(--text);
   line-height: 1.6;
@@ -78,8 +78,9 @@ nav {
 }
 
 .logo {
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 1rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text);
@@ -117,20 +118,19 @@ nav {
 }
 
 h1 {
+  font-family: 'Space Grotesk', sans-serif;
   font-size: clamp(3rem, 7vw, 5.25rem);
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.0;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
   margin-bottom: 1.75rem;
   min-height: 2.2em;
-  font-style: italic;
 }
 
 .cursor {
   color: var(--green);
   animation: blink 0.8s step-end infinite;
   font-weight: 300;
-  font-style: normal;
 }
 
 @keyframes blink {
@@ -139,6 +139,7 @@ h1 {
 }
 
 .subheadline {
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 1rem;
   color: var(--muted);
   max-width: 520px;
@@ -182,13 +183,12 @@ input[type="email"] {
   background: var(--bg3);
   color: var(--text);
   font-size: 0.875rem;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   outline: none;
   transition: background 0.2s;
 }
 
 input[type="email"]:focus { background: #161616; }
-
 input[type="email"]::placeholder { color: #444; }
 
 button[type="submit"] {
@@ -196,10 +196,10 @@ button[type="submit"] {
   background: var(--green);
   color: #000;
   border: none;
-  font-size: 0.8rem;
-  font-weight: 800;
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.06em;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
   white-space: nowrap;
@@ -266,15 +266,16 @@ button[type="submit"]:disabled { opacity: 0.5; cursor: not-allowed; }
 .stat-block { display: flex; flex-direction: column; gap: 0.4rem; }
 
 .stat-number {
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 3.75rem;
-  font-weight: 800;
-  letter-spacing: -0.05em;
+  font-weight: 700;
+  letter-spacing: -0.04em;
   line-height: 1;
   color: var(--text);
-  font-style: italic;
 }
 
 .stat-title {
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -326,16 +327,16 @@ button[type="submit"]:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .module-card h2 {
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 2rem;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.1;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.025em;
   margin-bottom: 1rem;
-  font-style: italic;
 }
 
 .module-card > p {
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   color: var(--muted);
   margin-bottom: 1.75rem;
   line-height: 1.7;
@@ -390,8 +391,9 @@ footer {
 }
 
 .footer-logo {
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 0.8rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #333;
