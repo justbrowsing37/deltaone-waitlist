@@ -14,7 +14,6 @@ window.addEventListener('resize', resizeCanvas);
 
 const COLS = 28;
 const ROWS = 18;
-let gridW, gridH;
 
 const nodes = [];
 for (let i = 0; i < COLS; i++) {
@@ -44,52 +43,32 @@ function drawGrid(t) {
     for (let j = 0; j < ROWS; j++) {
       const idx = i * ROWS + j;
       const p = pts[idx];
-
       if (i < COLS - 1) {
         const r = pts[(i + 1) * ROWS + j];
-        ctx.beginPath();
-        ctx.moveTo(p.x, p.y);
-        ctx.lineTo(r.x, r.y);
-        ctx.strokeStyle = '#22C55E';
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(r.x, r.y);
+        ctx.strokeStyle = '#22C55E'; ctx.lineWidth = 0.5; ctx.stroke();
       }
       if (j < ROWS - 1) {
         const b = pts[i * ROWS + (j + 1)];
-        ctx.beginPath();
-        ctx.moveTo(p.x, p.y);
-        ctx.lineTo(b.x, b.y);
-        ctx.strokeStyle = '#22C55E';
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(b.x, b.y);
+        ctx.strokeStyle = '#22C55E'; ctx.lineWidth = 0.5; ctx.stroke();
       }
-
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 1.2, 0, Math.PI * 2);
-      ctx.fillStyle = '#22C55E';
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x, p.y, 1.2, 0, Math.PI * 2);
+      ctx.fillStyle = '#22C55E'; ctx.fill();
     }
   }
 }
 
 let frame = 0;
-function animateGrid() {
-  drawGrid(frame++);
-  requestAnimationFrame(animateGrid);
-}
+function animateGrid() { drawGrid(frame++); requestAnimationFrame(animateGrid); }
 animateGrid();
 
-// ── TYPING ANIMATION ───────────────────────────────────────────
-const lines = [
-  'Learn markets.',
-  'Trade with conviction.'
-];
-
+// ── TYPING ANIMATION — runs once, stops on final line ──────────────
+const lines = ['Learn markets.', 'Trade with conviction.'];
 const typedEl = document.getElementById('typed-text');
 let lineIndex = 0;
 let charIndex = 0;
 let deleting = false;
-let typingStarted = false;
 
 function type() {
   const current = lines[lineIndex];
@@ -98,16 +77,10 @@ function type() {
     typedEl.textContent = current.slice(0, ++charIndex);
     if (charIndex === current.length) {
       if (lineIndex < lines.length - 1) {
+        // More lines to go — pause then delete
         setTimeout(() => { deleting = true; type(); }, 1000);
-      } else {
-        // All lines typed — pause then restart loop
-        setTimeout(() => {
-          lineIndex = 0;
-          charIndex = 0;
-          deleting = false;
-          type();
-        }, 4000);
       }
+      // Last line fully typed — stop. Cursor keeps blinking.
       return;
     }
   } else {
@@ -120,11 +93,10 @@ function type() {
     }
   }
 
-  const speed = deleting ? 35 : 65;
-  setTimeout(type, speed);
+  setTimeout(type, deleting ? 35 : 65);
 }
 
-// Start typing 0.8s after page load — after grid is visible
+// Start typing 0.8s after load — grid is already visible by then
 setTimeout(type, 800);
 
 // ── COUNTDOWN ─────────────────────────────────────────────────
@@ -139,19 +111,13 @@ updateCountdown();
 // ── SCROLL REVEAL ─────────────────────────────────────────────
 const reveals = document.querySelectorAll('.reveal');
 const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-    }
-  });
+  entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
 }, { threshold: 0.12 });
-
 reveals.forEach(el => observer.observe(el));
 
 // ── FORM SUBMISSION ───────────────────────────────────────────
 document.getElementById('signup-form').addEventListener('submit', async (e) => {
   e.preventDefault();
-
   const email = document.getElementById('email-input').value.trim();
   const btn = document.getElementById('submit-btn');
   const msg = document.getElementById('form-message');
@@ -183,9 +149,7 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
       msg.className = 'form-message success';
       btn.disabled = false;
       btn.textContent = 'Join Waitlist';
-    } else {
-      throw new Error();
-    }
+    } else { throw new Error(); }
   } catch {
     msg.textContent = 'Something went wrong. Try again.';
     msg.className = 'form-message error';
