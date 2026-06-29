@@ -26,13 +26,34 @@ for (let i = 0; i < COLS; i++) {
   }
 }
 
+// warp state — epicentre + intensity, decays over time
+let warpX = 0.5, warpY = 0.5, warpStrength = 0, warpDecay = 0;
+
 function drawGrid(t) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const w = canvas.width, h = canvas.height;
-  const pts = nodes.map(n => ({
-    x: (n.baseX + n.ox * Math.sin(t * n.speed + n.phase)) * w,
-    y: (n.baseY + n.oy * Math.cos(t * n.speed + n.phase + 1)) * h
-  }));
+
+  // decay warp each frame
+  if (warpStrength > 0) {
+    warpStrength = Math.max(0, warpStrength - warpDecay);
+  }
+
+  const pts = nodes.map(n => {
+    let nx = n.baseX + n.ox * Math.sin(t * n.speed + n.phase);
+    let ny = n.baseY + n.oy * Math.cos(t * n.speed + n.phase + 1);
+
+    if (warpStrength > 0) {
+      const dx = nx - warpX;
+      const dy = ny - warpY;
+      const dist = Math.sqrt(dx * dx + dy * dy) + 0.001;
+      const force = warpStrength / (dist * 18);
+      nx += dx * force;
+      ny += dy * force;
+    }
+
+    return { x: nx * w, y: ny * h };
+  });
+
   for (let i = 0; i < COLS; i++) {
     for (let j = 0; j < ROWS; j++) {
       const idx = i * ROWS + j, p = pts[idx];
@@ -51,9 +72,20 @@ function drawGrid(t) {
     }
   }
 }
+
 let frame = 0;
 function animateGrid() { drawGrid(frame++); requestAnimationFrame(animateGrid); }
 animateGrid();
+
+function triggerGridWarp() {
+  const hero = document.querySelector('.hero');
+  const rect = hero.getBoundingClientRect();
+  // epicentre as fraction of canvas
+  warpX = (rect.left + rect.width / 2) / window.innerWidth;
+  warpY = (rect.top + rect.height / 2) / window.innerHeight;
+  warpStrength = 0.18;
+  warpDecay = 0.0018;
+}
 
 // ── TYPING ─────────────────────────────────────────────────────
 const line1El   = document.getElementById('line-1');
@@ -107,9 +139,11 @@ reveals.forEach(el => observer.observe(el));
 function launchSuccessAnimation() {
   const form = document.getElementById('signup-form');
   const formLabel = document.querySelector('.form-label');
-  const waitlistWrap = document.querySelector('.waitlist-form');
 
-  // Fade out the form elements
+  // 1. Trigger grid warp immediately
+  triggerGridWarp();
+
+  // 2. Fade out form
   [form, formLabel].forEach(el => {
     if (el) { el.style.transition = 'opacity 0.4s ease'; el.style.opacity = '0'; }
   });
@@ -117,78 +151,81 @@ function launchSuccessAnimation() {
   setTimeout(() => {
     [form, formLabel].forEach(el => { if (el) el.style.display = 'none'; });
 
-    // Build the success container
+    // Build success container — no sonar rings
     const container = document.createElement('div');
     container.className = 'success-container';
     container.innerHTML = `
-      <div class="sonar-wrap">
-        <div class="sonar-ring r1"></div>
-        <div class="sonar-ring r2"></div>
-        <div class="sonar-ring r3"></div>
-        <div class="success-counter">
-          <span class="counter-number" id="counter-num">0</span>
-          <span class="counter-label mono">days until launch</span>
-        </div>
+      <div class="success-counter-wrap">
+        <span class="counter-number" id="counter-num">0</span>
+        <span class="counter-label mono">days until launch</span>
       </div>
       <p class="success-tagline mono" id="success-tagline"></p>
     `;
 
-    // Insert after the form area
     const heroContent = document.querySelector('.hero-content');
     const countdown = document.querySelector('.countdown');
     heroContent.insertBefore(container, countdown);
 
-    // Animate in
-    requestAnimationFrame(() => {
-      container.style.opacity = '0';
-      container.style.transition = 'opacity 0.5s ease';
-      requestAnimationFrame(() => { container.style.opacity = '1'; });
-    });
+    // Fade container in
+    container.style.opacity = '0';
+    container.style.transition = 'opacity 0.5s ease';
+    requestAnimationFrame(() => requestAnimationFrame(() => { container.style.opacity = '1'; }));
 
-    // Count up to actual days remaining
     const target = getDaysUntilLaunch();
-    const duration = 1400;
-    const start = performance.now();
     const numEl = document.getElementById('counter-num');
+    const CHARS = '0123456789';
 
-    function countUp(now) {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
-      // Ease out expo
-      const eased = 1 - Math.pow(2, -10 * progress);
-      const current = Math.floor(eased * target);
+    // Phase 1: scramble for 900ms
+    const scrambleDuration = 900;
+    const scrambleStart = performance.now();
 
-      // Glitch effect on the number
-      if (progress < 0.92 && Math.random() > 0.7) {
-        numEl.style.textShadow = `${(Math.random()-0.5)*6}px 0 #4ade80, ${(Math.random()-0.5)*6}px 0 rgba(74,222,128,0.4)`;
-        numEl.style.transform = `translateX(${(Math.random()-0.5)*3}px)`;
+    // persistent glow throughout
+    numEl.style.textShadow = '0 0 24px rgba(74,222,128,0.55)';
+
+    function scramble(now) {
+      const elapsed = now - scrambleStart;
+      if (elapsed < scrambleDuration) {
+        // random number same digit-length as target
+        const digits = String(target).length;
+        let rand = '';
+        for (let i = 0; i < digits; i++) rand += CHARS[Math.floor(Math.random() * 10)];
+        numEl.textContent = rand;
+
+        // subtle horizontal jitter
+        numEl.style.transform = `translateX(${(Math.random()-0.5)*4}px)`;
+        // flicker glow
+        const g = 0.4 + Math.random() * 0.4;
+        numEl.style.textShadow = `0 0 ${20 + Math.random()*20}px rgba(74,222,128,${g})`;
+
+        requestAnimationFrame(scramble);
       } else {
-        numEl.style.textShadow = '0 0 20px rgba(74,222,128,0.6)';
-        numEl.style.transform = 'translateX(0)';
-      }
-
-      numEl.textContent = current;
-
-      if (progress < 1) {
-        requestAnimationFrame(countUp);
-      } else {
+        // Phase 2: lock in with a hard snap
         numEl.textContent = target;
-        numEl.style.textShadow = '0 0 30px rgba(74,222,128,0.8)';
         numEl.style.transform = 'translateX(0)';
+        numEl.style.textShadow = '0 0 40px rgba(74,222,128,0.95), 0 0 80px rgba(74,222,128,0.4)';
 
-        // Fade in the tagline after count lands
+        // brief scale punch on lock
+        numEl.style.transition = 'transform 0.15s cubic-bezier(0.34,1.56,0.64,1)';
+        numEl.style.transform = 'scale(1.08)';
+        setTimeout(() => {
+          numEl.style.transform = 'scale(1)';
+          // settle glow
+          numEl.style.textShadow = '0 0 30px rgba(74,222,128,0.8), 0 0 60px rgba(74,222,128,0.3)';
+        }, 160);
+
+        // Fade in tagline
         setTimeout(() => {
           const tagline = document.getElementById('success-tagline');
           tagline.textContent = "we're not stopping. see you then.";
           tagline.style.opacity = '0';
           tagline.style.transition = 'opacity 0.8s ease';
           requestAnimationFrame(() => { tagline.style.opacity = '1'; });
-        }, 300);
+        }, 400);
       }
     }
 
-    setTimeout(() => requestAnimationFrame(countUp), 200);
-  }, 450);
+    setTimeout(() => requestAnimationFrame(scramble), 150);
+  }, 420);
 }
 
 // ── FORM SUBMISSION ────────────────────────────────────────────
