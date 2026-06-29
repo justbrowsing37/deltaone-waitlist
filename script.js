@@ -39,15 +39,15 @@ function drawGrid(t) {
       if (i < COLS - 1) {
         const r = pts[(i+1)*ROWS+j];
         ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(r.x,r.y);
-        ctx.strokeStyle='#22C55E'; ctx.lineWidth=0.5; ctx.stroke();
+        ctx.strokeStyle='rgba(34,197,94,0.18)'; ctx.lineWidth=0.5; ctx.stroke();
       }
       if (j < ROWS - 1) {
         const b = pts[i*ROWS+(j+1)];
         ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(b.x,b.y);
-        ctx.strokeStyle='#22C55E'; ctx.lineWidth=0.5; ctx.stroke();
+        ctx.strokeStyle='rgba(34,197,94,0.18)'; ctx.lineWidth=0.5; ctx.stroke();
       }
       ctx.beginPath(); ctx.arc(p.x,p.y,1.2,0,Math.PI*2);
-      ctx.fillStyle='#22C55E'; ctx.fill();
+      ctx.fillStyle='rgba(34,197,94,0.35)'; ctx.fill();
     }
   }
 }
@@ -55,7 +55,7 @@ let frame = 0;
 function animateGrid() { drawGrid(frame++); requestAnimationFrame(animateGrid); }
 animateGrid();
 
-// ── TYPING — two lines stack, first stays, second types under ────────
+// ── TYPING ─────────────────────────────────────────────────────
 const line1El   = document.getElementById('line-1');
 const cursor1El = document.getElementById('cursor-1');
 const line2El   = document.getElementById('line-2');
@@ -74,35 +74,124 @@ function typeString(el, str, speed, cb) {
   setTimeout(tick, speed);
 }
 
-// Sequence: type line 1 → pause → hide cursor 1, show cursor 2 → type line 2 → hold
 setTimeout(() => {
   typeString(line1El, LINE1, 65, () => {
-    // Line 1 done — pause 900ms then start line 2
     setTimeout(() => {
-      cursor1El.classList.add('hidden');  // hide cursor from line 1
-      cursor2El.classList.remove('hidden'); // show cursor on line 2
-      typeString(line2El, LINE2, 65, null); // type line 2, stop
+      cursor1El.classList.add('hidden');
+      cursor2El.classList.remove('hidden');
+      typeString(line2El, LINE2, 65, null);
     }, 900);
   });
 }, 800);
 
-// ── COUNTDOWN ─────────────────────────────────────────────────
-function updateCountdown() {
+// ── COUNTDOWN ──────────────────────────────────────────────────
+function getDaysUntilLaunch() {
   const launch = new Date('2027-01-01T00:00:00');
   const now = new Date();
-  const diff = Math.ceil((launch - now) / (1000 * 60 * 60 * 24));
-  document.getElementById('days-count').textContent = diff > 0 ? diff : '0';
+  return Math.max(0, Math.ceil((launch - now) / (1000 * 60 * 60 * 24)));
+}
+
+function updateCountdown() {
+  document.getElementById('days-count').textContent = getDaysUntilLaunch();
 }
 updateCountdown();
 
-// ── SCROLL REVEAL ─────────────────────────────────────────────
+// ── SCROLL REVEAL ──────────────────────────────────────────────
 const reveals = document.querySelectorAll('.reveal');
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
 }, { threshold: 0.12 });
 reveals.forEach(el => observer.observe(el));
 
-// ── FORM SUBMISSION ───────────────────────────────────────────
+// ── SUCCESS ANIMATION ──────────────────────────────────────────
+function launchSuccessAnimation() {
+  const form = document.getElementById('signup-form');
+  const formLabel = document.querySelector('.form-label');
+  const waitlistWrap = document.querySelector('.waitlist-form');
+
+  // Fade out the form elements
+  [form, formLabel].forEach(el => {
+    if (el) { el.style.transition = 'opacity 0.4s ease'; el.style.opacity = '0'; }
+  });
+
+  setTimeout(() => {
+    [form, formLabel].forEach(el => { if (el) el.style.display = 'none'; });
+
+    // Build the success container
+    const container = document.createElement('div');
+    container.className = 'success-container';
+    container.innerHTML = `
+      <div class="sonar-wrap">
+        <div class="sonar-ring r1"></div>
+        <div class="sonar-ring r2"></div>
+        <div class="sonar-ring r3"></div>
+        <div class="success-counter">
+          <span class="counter-number" id="counter-num">0</span>
+          <span class="counter-label mono">days until launch</span>
+        </div>
+      </div>
+      <p class="success-tagline mono" id="success-tagline"></p>
+    `;
+
+    // Insert after the form area
+    const heroContent = document.querySelector('.hero-content');
+    const countdown = document.querySelector('.countdown');
+    heroContent.insertBefore(container, countdown);
+
+    // Animate in
+    requestAnimationFrame(() => {
+      container.style.opacity = '0';
+      container.style.transition = 'opacity 0.5s ease';
+      requestAnimationFrame(() => { container.style.opacity = '1'; });
+    });
+
+    // Count up to actual days remaining
+    const target = getDaysUntilLaunch();
+    const duration = 1400;
+    const start = performance.now();
+    const numEl = document.getElementById('counter-num');
+
+    function countUp(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease out expo
+      const eased = 1 - Math.pow(2, -10 * progress);
+      const current = Math.floor(eased * target);
+
+      // Glitch effect on the number
+      if (progress < 0.92 && Math.random() > 0.7) {
+        numEl.style.textShadow = `${(Math.random()-0.5)*6}px 0 #4ade80, ${(Math.random()-0.5)*6}px 0 rgba(74,222,128,0.4)`;
+        numEl.style.transform = `translateX(${(Math.random()-0.5)*3}px)`;
+      } else {
+        numEl.style.textShadow = '0 0 20px rgba(74,222,128,0.6)';
+        numEl.style.transform = 'translateX(0)';
+      }
+
+      numEl.textContent = current;
+
+      if (progress < 1) {
+        requestAnimationFrame(countUp);
+      } else {
+        numEl.textContent = target;
+        numEl.style.textShadow = '0 0 30px rgba(74,222,128,0.8)';
+        numEl.style.transform = 'translateX(0)';
+
+        // Fade in the tagline after count lands
+        setTimeout(() => {
+          const tagline = document.getElementById('success-tagline');
+          tagline.textContent = "we're not stopping. see you then.";
+          tagline.style.opacity = '0';
+          tagline.style.transition = 'opacity 0.8s ease';
+          requestAnimationFrame(() => { tagline.style.opacity = '1'; });
+        }, 300);
+      }
+    }
+
+    setTimeout(() => requestAnimationFrame(countUp), 200);
+  }, 450);
+}
+
+// ── FORM SUBMISSION ────────────────────────────────────────────
 document.getElementById('signup-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const email = document.getElementById('email-input').value.trim();
@@ -122,14 +211,9 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
       body: JSON.stringify({ email })
     });
     if (res.status === 201) {
-      msg.textContent = "You're in. We'll be in touch before launch.";
-      msg.className = 'form-message success';
-      document.getElementById('email-input').value = '';
-      btn.textContent = 'Joined ✓';
+      launchSuccessAnimation();
     } else if (res.status === 409) {
-      msg.textContent = "You're already on the list.";
-      msg.className = 'form-message success';
-      btn.disabled = false; btn.textContent = 'Join Waitlist';
+      launchSuccessAnimation();
     } else { throw new Error(); }
   } catch {
     msg.textContent = 'Something went wrong. Try again.';
